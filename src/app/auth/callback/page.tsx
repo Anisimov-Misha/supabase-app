@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../AuthContext'
@@ -9,23 +10,47 @@ export default function AuthCallback() {
   const { setToken } = useAuth()
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const { data, error } = await supabase.auth.getSession()
-      if (error) {
-        console.error('Error fetching session', error)
-        return router.push('/signin')
-      }
+    const handleAuthCallback = async () => {
+      const hash = window.location.hash
+      const params = new URLSearchParams(hash.substring(1))
 
-      if (data?.session) {
+      const access_token = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
+      const type = params.get('type')
+
+      if (access_token && refresh_token) {
+        const { data, error } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        })
+
+        if (error) {
+          console.error('Error setting session:', error)
+          return router.replace('/signin')
+        }
+
         setToken(data.session)
         sessionStorage.setItem('token', JSON.stringify(data.session))
-        router.push('/dashboard')
+
+        window.history.replaceState(null, '', '/')
+
+        if (type === 'recovery') {
+          router.replace('/reset-password')
+        } else {
+          router.replace('/dashboard')
+        }
       } else {
-        router.push('/signin')
+        const { data } = await supabase.auth.getSession()
+        if (data?.session) {
+          setToken(data.session)
+          router.replace('/dashboard')
+        } else {
+          router.replace('/signin')
+        }
       }
     }
 
-    handleAuth()
+    handleAuthCallback()
   }, [router, setToken])
 
   return <p>Перевірка авторизації...</p>
