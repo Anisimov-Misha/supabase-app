@@ -13,40 +13,24 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       const hash = window.location.hash
       const params = new URLSearchParams(hash.substring(1))
-
-      const access_token = params.get('access_token')
-      const refresh_token = params.get('refresh_token')
       const type = params.get('type')
 
-      if (access_token && refresh_token) {
-        const { data, error } = await supabase.auth.setSession({
-          access_token,
-          refresh_token,
-        })
+      const { data, error } = await supabase.auth.getSession()
 
-        if (error) {
-          console.error('Error setting session:', error)
-          return router.replace('/signin')
-        }
+      if (error || !data.session) {
+        console.error('Помилка при отриманні сесії', error)
+        return router.replace('/signin')
+      }
 
-        setToken(data.session)
-        sessionStorage.setItem('token', JSON.stringify(data.session))
+      setToken(data.session)
+      sessionStorage.setItem('token', JSON.stringify(data.session))
 
-        window.history.replaceState(null, '', '/')
+      window.history.replaceState(null, '', '/')
 
-        if (type === 'recovery') {
-          router.replace('/reset-password')
-        } else {
-          router.replace('/dashboard')
-        }
+      if (type === 'recovery') {
+        router.replace('/reset-password-confirm') 
       } else {
-        const { data } = await supabase.auth.getSession()
-        if (data?.session) {
-          setToken(data.session)
-          router.replace('/dashboard')
-        } else {
-          router.replace('/signin')
-        }
+        router.replace('/dashboard')
       }
     }
 
