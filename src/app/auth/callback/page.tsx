@@ -11,15 +11,17 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      if (typeof window === 'undefined') return
+
       const hash = window.location.hash
-      const params = new URLSearchParams(hash.substring(1))
+      const params = new URLSearchParams(hash.substring(1)) 
 
       const access_token = params.get('access_token')
       const refresh_token = params.get('refresh_token')
       const type = params.get('type')
 
       if (!access_token || !refresh_token) {
-        console.error('Токени не знайдено в URL')
+        console.error('Не знайдено токенів у URL')
         return router.replace('/signin')
       }
 
@@ -29,19 +31,19 @@ export default function AuthCallback() {
       })
 
       if (error || !data.session) {
-        console.error('Помилка при встановленні сесії', error)
+        console.error('Помилка при встановленні сесії:', error)
         return router.replace('/signin')
       }
 
       setToken(data.session)
       sessionStorage.setItem('token', JSON.stringify(data.session))
 
-      window.history.replaceState(null, '', '/') 
+      window.history.replaceState(null, '', window.location.pathname)
 
       if (type === 'recovery') {
-        router.replace('/reset-password-confirm')
+        router.replace('/reset-password-confirm') 
       } else {
-        router.replace('/dashboard')
+        router.replace('/dashboard') 
       }
     }
 

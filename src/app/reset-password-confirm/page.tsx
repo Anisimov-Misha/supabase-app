@@ -76,20 +76,14 @@ export default function UpdatePasswordPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const hashParams = parseHashParams(window.location.hash)
-    if (hashParams.error) {
-      setError(`Помилка: ${hashParams.error_description || hashParams.error}`)
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (!session) {
+      setError('Ви не авторизовані. Будь ласка, увійдіть заново.')
       setIsValidLink(false)
-    } else {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!session) {
-          setError('Ви не авторизовані. Будь ласка, увійдіть заново.')
-          setIsValidLink(false)
-          setTimeout(() => router.push('/'), 1500)
-        }
-      })
+      setTimeout(() => router.push('/'), 1500)
     }
-  }, [router])
+  })
+}, [router])
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -117,7 +111,7 @@ export default function UpdatePasswordPage() {
       setError(error.message)
     } else {
       setMessage('Пароль успішно оновлено. Ви будете перенаправлені на головну сторінку.')
-      setTimeout(() => router.push('/'), 3000)
+      setTimeout(() => router.push('/signin'), 1500)
     }
   }
 
