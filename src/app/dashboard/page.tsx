@@ -21,6 +21,21 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+  const hash = window.location.hash
+  if (hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.slice(1))
+    const access_token = params.get('access_token')
+    const refresh_token = params.get('refresh_token')
+
+    if (access_token && refresh_token) {
+      supabase.auth.setSession({ access_token, refresh_token }).then(() => {
+        window.history.replaceState(null, '', window.location.pathname)
+      })
+    }
+  }
+}, [])
+
+  useEffect(() => {
     async function checkSession() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
@@ -33,6 +48,7 @@ export default function Dashboard() {
     }
     checkSession()
   }, [router, setToken])
+
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
