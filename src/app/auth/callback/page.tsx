@@ -13,22 +13,33 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       const hash = window.location.hash
       const params = new URLSearchParams(hash.substring(1))
+
+      const access_token = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
       const type = params.get('type')
 
-      const { data, error } = await supabase.auth.getSession()
+      if (!access_token || !refresh_token) {
+        console.error('Токени не знайдено в URL')
+        return router.replace('/signin')
+      }
+
+      const { data, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      })
 
       if (error || !data.session) {
-        console.error('Помилка при отриманні сесії', error)
+        console.error('Помилка при встановленні сесії', error)
         return router.replace('/signin')
       }
 
       setToken(data.session)
       sessionStorage.setItem('token', JSON.stringify(data.session))
 
-      window.history.replaceState(null, '', '/')
+      window.history.replaceState(null, '', '/') 
 
       if (type === 'recovery') {
-        router.replace('/reset-password-confirm') 
+        router.replace('/reset-password-confirm')
       } else {
         router.replace('/dashboard')
       }
