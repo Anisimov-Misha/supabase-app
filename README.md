@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Проєкт: Реєстрація та Дашборд на Next.js + Supabase
 
-## Getting Started
+Опис проекту
 
-First, run the development server:
+Веб-застосунок для реєстрації, входу користувача, підтвердження email, відновлення паролю та перегляду дашборду з інформацією користувача.  
+Інформація в дашборді включає email, ID користувача та дату створення акаунту.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Використані технології
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Next.js 
+- React 
+- TypeScript
+- Material UI (MUI)
+- Supabase
+- Context API
+- CSS Modules / styled-components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Команди для запуску (локально)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Клонуйте репозиторій та перейдіть у папку проекту
+2. У файлі client.ts можете замінити supabaseUrl та supabaseKey на власні 
+2. Встановіть залежності (npm install)
+3. Запустіть дев сервер (npm run dev)
+4. Відкрийте http://localhost:3000 у браузері та користуйтеся
