@@ -1,18 +1,14 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, {createContext,useContext,useEffect,useState,ReactNode,} from 'react'
 import { supabase } from './client'
-
-type AuthContextType = {
-  token: any | null
-  loading: boolean
-  setToken: React.Dispatch<React.SetStateAction<any | null>>
-}
+import { Session } from '@supabase/supabase-js'
+import { AuthContextType } from './types/app.model'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<any | null>(null)
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [token, setToken] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -24,19 +20,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session) {
         setToken(session)
       }
+
       setLoading(false)
     }
 
     getSession()
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event: any, session: any) => {
-        setToken(session)
-      }
-    )
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setToken(session)
+    })
 
     return () => {
-      listener?.subscription.unsubscribe()
+      subscription.unsubscribe()
     }
   }, [])
 

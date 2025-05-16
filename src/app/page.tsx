@@ -1,7 +1,6 @@
 'use client'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -11,7 +10,6 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { redirect } from 'next/navigation';
 import { supabase } from './client';
 import { useAuth } from './AuthContext';
 
@@ -70,36 +68,47 @@ export default function SignUp() {
     const [emailError, setEmailError] = useState(false)
     const [emailErrorMessage, setEmailErrorMessage] = useState('')
 
+    const [awaitingEmailConfirmation, setAwaitingEmailConfirmation] = useState(false)
+
     const handleSubmit = async (e: any) => {
-        e.preventDefault()
+      e.preventDefault()
 
-        setPasswordError(false)
-        setEmailError(false)
-        setPasswordErrorMessage('')
-        setEmailErrorMessage('')
-        if(!isValidEmail(email)){
-            setEmailError(true)
-            setEmailErrorMessage('Не валідний email!')
-            return;
-        }
-        if(password.trim().length < 6) {
-            setPasswordError(true)
-            setPasswordErrorMessage('Пароль має бути не менше 6 символів!')
-            return;
-        }
+      setPasswordError(false)
+      setEmailError(false)
+      setPasswordErrorMessage('')
+      setEmailErrorMessage('')
+      
+      if (!isValidEmail(email)) {
+        setEmailError(true)
+        setEmailErrorMessage('Не валідний email!')
+        return
+      }
+      if (password.trim().length < 6) {
+        setPasswordError(true)
+        setPasswordErrorMessage('Пароль має бути не менше 6 символів!')
+        return
+      }
 
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-        });
-        if (error) {
-            alert(error.message);
-            return;
-        }
-        setToken(data);
-        alert('Перевірте свою електронну пошту, щоб отримати посилання для підтвердження!');
-        redirect('/dashboard'); 
+      const redirectUrl = `${window.location.origin}/auth/callback`
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      })
+
+      if (error) {
+        alert(error.message)
+        return
+      }
+      if (data.session) {
+        setToken(data.session);
+      }
+      setAwaitingEmailConfirmation(true) 
     }
+
 
     function isValidEmail(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -172,6 +181,12 @@ export default function SignUp() {
                     <Typography sx={{ textAlign: 'center' }}>Вже маєте аккаунт?
                         <Link href="/signin" variant="body2" sx={{ alignSelf: 'center' }}> Увійти</Link>
                     </Typography>
+
+                    {awaitingEmailConfirmation && (
+                      <Typography sx={{ textAlign: 'center', color: 'orange' }}>
+                        Ми надіслали лист для підтвердження на <strong>{email}</strong>. Перевірте свою пошту!
+                      </Typography>
+                    )}
 
                 </Box>
             </Card>

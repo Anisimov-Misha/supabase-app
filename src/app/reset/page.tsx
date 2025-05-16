@@ -1,7 +1,6 @@
 'use client'
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -105,6 +104,17 @@ export default function ResetPasswordPage() {
                     </FormControl>
 
                     <Button type="submit" fullWidth variant="contained">Відновити</Button>
+
+                    {message && (
+                      <Typography sx={{ color: 'green', textAlign: 'center' }}>
+                        {message}
+                      </Typography>
+                    )}
+                    {error && (
+                      <Typography sx={{ color: 'red', textAlign: 'center' }}>
+                        {error}
+                      </Typography>
+                    )}
           
                 </Box>
 
