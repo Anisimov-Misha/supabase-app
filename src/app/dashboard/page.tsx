@@ -5,39 +5,42 @@ import { useAuth } from '../AuthContext'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../client'
 import {
-  Card,
-  CardContent,
-  Typography,
-  Button,
   Box,
+  Button,
   CircularProgress,
+  Typography,
   Stack,
+  Divider,
 } from '@mui/material'
 import dayjs from 'dayjs'
+import UploadForm from '../UploadForm'
 
 export default function Dashboard() {
   const { token, setToken } = useAuth()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [uploadOpen, setUploadOpen] = useState(false)
 
   useEffect(() => {
-  const hash = window.location.hash
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.slice(1))
-    const access_token = params.get('access_token')
-    const refresh_token = params.get('refresh_token')
+    const hash = window.location.hash
+    if (hash.includes('access_token')) {
+      const params = new URLSearchParams(hash.slice(1))
+      const access_token = params.get('access_token')
+      const refresh_token = params.get('refresh_token')
 
-    if (access_token && refresh_token) {
-      supabase.auth.setSession({ access_token, refresh_token }).then(() => {
-        window.history.replaceState(null, '', window.location.pathname)
-      })
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(() => {
+          window.history.replaceState(null, '', window.location.pathname)
+        })
+      }
     }
-  }
-}, [])
+  }, [])
 
   useEffect(() => {
     async function checkSession() {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       if (!session) {
         setToken(null)
         router.replace('/')
@@ -49,7 +52,6 @@ export default function Dashboard() {
     checkSession()
   }, [router, setToken])
 
-
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setToken(null)
@@ -58,7 +60,12 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
         <CircularProgress />
       </Box>
     )
@@ -67,40 +74,43 @@ export default function Dashboard() {
   if (!token) return null
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      bgcolor="#f9f9f9"
-      px={2}
-    >
-      <Card sx={{ minWidth: 400, p: 3, boxShadow: 5 }}>
-        <CardContent>
-          <Typography variant="h4" gutterBottom align="center">
-            Особистий кабінет
-          </Typography>
+    <Box px={2} py={3} bgcolor="#f9f9f9" minHeight="100vh">
+      {/* Header */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={2}
+        flexWrap="wrap"
+        gap={1}
+      >
+        <Stack direction="row" spacing={4} alignItems="center" flexWrap="wrap">
+          <Info label="Email" value={token.user.email ?? '—'} />
+          <Info label="ID користувача" value={token.user.id} />
+          <Info
+            label="Дата створення"
+            value={dayjs(token.user.created_at).format('DD.MM.YYYY HH:mm')}
+          />
+        </Stack>
 
-          <Stack spacing={2} mt={3}>
-            <Info label="Email" value={token.user.email ?? '—'} />
-            <Info label="ID користувача" value={token.user.id} />
-            <Info
-              label="Дата створення"
-              value={dayjs(token.user.created_at).format('DD.MM.YYYY HH:mm')}
-            />
-          </Stack>
+        <Button variant="outlined" color="error" onClick={handleLogout}>
+          Вийти
+        </Button>
+      </Box>
 
-          <Button
-            onClick={handleLogout}
-            variant="contained"
-            color="error"
-            fullWidth
-            sx={{ mt: 4 }}
-          >
-            Вийти
-          </Button>
-        </CardContent>
-      </Card>
+      <Divider sx={{ mb: 2 }} />
+
+      {/* Кнопка додати фото */}
+      <Button
+        variant="contained"
+        onClick={() => setUploadOpen(true)}
+        sx={{ mb: 3 }}
+      >
+        Додати фото
+      </Button>
+
+      {/* UploadForm діалог */}
+      <UploadForm open={uploadOpen} onClose={() => setUploadOpen(false)} />
     </Box>
   )
 }

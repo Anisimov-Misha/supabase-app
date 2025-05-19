@@ -5,3 +5,13 @@ export interface AuthContextType {
   loading: boolean
   setToken: (token: Session | null) => void
 }
+
+export type UploadedFile = {
+  url: string;
+  name: string;
+};
+
+export interface UploadFormProps {
+  open: boolean
+  onClose: () => void
+}
