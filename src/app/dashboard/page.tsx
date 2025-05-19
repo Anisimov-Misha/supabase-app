@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import dayjs from 'dayjs'
 import UploadForm from '../UploadForm'
+import Link from 'next/link'
 
 export default function Dashboard() {
   const { token, setToken } = useAuth()
@@ -75,7 +76,6 @@ export default function Dashboard() {
 
   return (
     <Box px={2} py={3} bgcolor="#f9f9f9" minHeight="100vh">
-      {/* Header */}
       <Box
         display="flex"
         alignItems="center"
@@ -93,6 +93,20 @@ export default function Dashboard() {
           />
         </Stack>
 
+          <Link href="/dashboard/tasks" passHref>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{
+                fontSize: '1.1rem',
+                paddingX: 3,
+                paddingY: 1.5,
+              }}
+            >
+              Мій ToDo - list
+            </Button>
+          </Link>
+
         <Button variant="outlined" color="error" onClick={handleLogout}>
           Вийти
         </Button>
@@ -100,16 +114,14 @@ export default function Dashboard() {
 
       <Divider sx={{ mb: 2 }} />
 
-      {/* Кнопка додати фото */}
       <Button
         variant="contained"
         onClick={() => setUploadOpen(true)}
-        sx={{ mb: 3 }}
+        sx={{ mb: 2 }}
       >
         Додати фото
       </Button>
 
-      {/* UploadForm діалог */}
       <UploadForm open={uploadOpen} onClose={() => setUploadOpen(false)} />
     </Box>
   )

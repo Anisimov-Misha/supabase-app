@@ -15,3 +15,19 @@ export interface UploadFormProps {
   open: boolean
   onClose: () => void
 }
+
+export type Task = {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+};
+
+export type TaskStatus = 'todo' | 'in_progress' | 'done';
+
+export type TaskColumnProps = {
+  id: string;
+  title: string;
+  tasks: any[];
+  onTaskClick?: (task: any) => void;
+};
